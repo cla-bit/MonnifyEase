@@ -1,0 +1,70 @@
+[tool.poetry]
+name = "monnifyease"
+version = "0.1.0"
+description = "This is a Monnify API wrapper"
+authors = ["Peter Mbachu <doublep098@gmail.com>"]
+maintainers = [
+    "petermbachu.bincom <petermbachu.bincom@gmail.com>",
+]
+license = "MIT"
+readme = "README.md"
+keywords = ["paystack", "api", "wrapper"]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Development Status :: 5 - Production/Stable",
+    "Natural Language :: English",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+packages = [{include = "monnifyease"}]
+
+
+[license]
+text = "Copyright ©2024 Peter Mbachu"
+
+
+[tool.poetry.urls]
+"Homepage" = "https://github.com/cla-bit/MonnifyEase"
+"Repository" = "https://github.com/cla-bit/MonnifyEase"
+"Source Code" = "https://github.com/cla-bit/MonnifyEase"
+"Documentation" = "https://github.com/cla-bit/MonnifyEase"
+"Bug Tracker" = "https://github.com/cla-bit/MonnifyEase/issues"
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiohttp = "^3.9.3"
+aioresponses = "^0.7.6"
+requests = "^2.31.0"
+responses = "^0.25.0"
+python-decouple = "^3.8"
+pytest = "^8.0.2"
+twine = "^5.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.2.0"
+pylint = "^3.1.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.0.2"
+responses = "^0.25.0"
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--doctest-modules"
+
+
+[tool.black]
+target-version = ['py310', 'py311']
+include = '\.pyi?$'
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
