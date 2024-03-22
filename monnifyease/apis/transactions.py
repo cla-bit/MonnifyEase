@@ -4,7 +4,7 @@ The Transactions API allows you to create and manage payments on your integratio
 
 from datetime import date
 from typing import Optional
-from monnifyease.base import MonnifyRequestClient
+from monnifyease._base import MonnifyRequestClient
 
 
 class Transactions(MonnifyRequestClient):
@@ -56,4 +56,4 @@ class Transactions(MonnifyRequestClient):
             'from_date': from_date,
             'to_date': to_date
         }
-        return self._get("/transactions/search", params=params)
+        return self._get("/v1/transactions/search", params=params)

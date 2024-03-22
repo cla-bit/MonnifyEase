@@ -17,31 +17,54 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-MONNIFY_SECRET_KEY = config("MONNIFY_SECRET_KEY")
-MONNIFY_API_KEY = config("MONNIFY_API_KEY")
+MONNIFY_TEST_SECRET_KEY = config("MONNIFY_TEST_SECRET_KEY")
+MONNIFY_TEST_API_KEY = config("MONNIFY_TEST_API_KEY")
+
+MONNIFY_LIVE_SECRET_KEY = config("MONNIFY_LIVE_SECRET_KEY")
+MONNIFY_LIVE_API_KEY = config("MONNIFY_LIVE_API_KEY")
 
 
 class MonnifyBaseClient:
     """Base Client API for Monnify API"""
 
-    _MONNIFY_SAND_BOX_URL = "https://sandbox.monnify.com/api/v1/"
+    _MONNIFY_SAND_BOX_URL = "https://sandbox.monnify.com/api/"
+    _MONNIFY_LIVE_BOX_URL = "https://api.monnify.com/api/"
     _VALID_HTTP_METHODS = {"GET", "POST", "PUT", "DELETE"}
 
-    def __init__(self, api_key: str = None, secret_key: str = None) -> None:
+    def __init__(self, environment: str = "test") -> None:
         """
-        :param api_key:
-        :param secret_key:
+        Initialize the Monnify Base Client with the chosen environment
+
+        :param: environment: the environment platform you want to connect
 
         :return
         """
-        self._api_key = api_key
-        self._secret_key = secret_key
+        self._environment = environment
 
-        # Default to MONNIFY_API_KEY and MONNIFY_SECRET_KEY if not provided in the instance
-        if not self._api_key:
-            self._api_key = MONNIFY_API_KEY
-        if not self._secret_key:
-            self._secret_key = MONNIFY_SECRET_KEY
+        if self._environment not in ("test", "live"):
+            logger.error(
+                "Kindly ensure you have either 'test' or 'live' environment variables"
+            )
+            raise ValueError(
+                "Kindly ensure you have either 'test' or 'live' environment variables"
+            )
+
+        # load base url specific configuration
+        self._base_url = {
+            "test": self._MONNIFY_SAND_BOX_URL,
+            "live": self._MONNIFY_LIVE_BOX_URL,
+        }[self._environment]
+
+        # Load environment specific configurations
+        self._api_key = {
+            "test": MONNIFY_TEST_API_KEY,
+            "live": MONNIFY_LIVE_API_KEY,
+        }[self._environment]
+
+        self._secret_key = {
+            "test": MONNIFY_TEST_SECRET_KEY,
+            "live": MONNIFY_LIVE_SECRET_KEY,
+        }[self._environment]
 
         # Raise an error if MONNIFY_API_KEY and MONNIFY_SECRET_KEY are not set in the instance or environment variables
         if not self._api_key and self._secret_key:
@@ -65,14 +88,22 @@ class MonnifyBaseClient:
         """
         :return:
         """
-        # url = self._join_url("auth/login")
+
         try:
             auth_header = self._get_authorization_header()
-            headers = {"Authorization": auth_header, "Content-Type": "application/json"}
+            headers = {
+                "Authorization": auth_header,
+                "Content-Type": "application/json",
+                "User-Agent": "monnifyease/0.1.0",
+            }
             token_request_body = {"grant_type": "authorization_code"}
-            response = self._session.post(url=self._join_url("auth/login"), headers=headers, json=token_request_body)
-            response = response.json()
-            return response["responseBody"]["accessToken"]
+            access_response = self._session.post(
+                url=self._join_url("v1/auth/login"),
+                headers=headers,
+                json=token_request_body
+            )
+            access_response = access_response.json()
+            return access_response["responseBody"]["accessToken"]
         except requests.RequestException as error:
             logger.error("Error %s:", error)
             raise
@@ -85,7 +116,11 @@ class MonnifyBaseClient:
         """
         if path.startswith("/"):
             path = path[1:]
-        return urljoin(self._MONNIFY_SAND_BOX_URL, path)
+
+        if self._environment == "test":
+            return urljoin(self._base_url, path)
+
+        return urljoin(self._base_url, path)
 
     def _auth_request_header(self):
         """
@@ -95,6 +130,7 @@ class MonnifyBaseClient:
         return {
             "Authorization": f"Bearer {self._access_token}",
             "Content-Type": "application/json",
+            "User-Agent": "monnifyease/0.1.0",
         }
 
     def _request_url(
@@ -136,6 +172,9 @@ class MonnifyBaseClient:
             ) as response:
                 logger.info("Response Status Code: %s", response.status_code)
                 logger.info("Response JSON: %s", response.json())
+
+                print(response.request.headers)
+                print(response.headers)
                 return response.json()
         except requests.RequestException as error:
             logger.error("Error %s:", error)
