@@ -31,7 +31,7 @@ class MonnifyBaseClient:
     _MONNIFY_LIVE_BOX_URL = "https://api.monnify.com/api/"
     _VALID_HTTP_METHODS = {"GET", "POST", "PUT", "DELETE"}
 
-    def __init__(self, environment: str = "test") -> None:
+    def __init__(self, environment: str = "test") -> str:
         """
         Initialize the Monnify Base Client with the chosen environment
 
