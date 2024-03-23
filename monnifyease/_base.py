@@ -31,13 +31,14 @@ class MonnifyBaseClient:
     _MONNIFY_LIVE_BOX_URL = "https://api.monnify.com/api/"
     _VALID_HTTP_METHODS = {"GET", "POST", "PUT", "DELETE"}
 
-    def __init__(self, environment: str = "test") -> str:
+    def __init__(self, environment: str = "test"):
         """
         Initialize the Monnify Base Client with the chosen environment
 
         :param: environment: the environment platform you want to connect
 
-        :return
+        :return: the connection to the server
+
         """
         self._environment = environment
 
