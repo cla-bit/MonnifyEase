@@ -6,8 +6,8 @@ import base64
 import json
 import logging
 
-# from datetime import time, date
-# from typing import Union
+from datetime import time, date
+from typing import Union
 
 from urllib.parse import urljoin
 from decouple import config
@@ -134,9 +134,35 @@ class MonnifyBaseClient:
             "User-Agent": "monnifyease/0.1.0",
         }
 
+    @staticmethod
+    def _convert_to_string(value: Union[bool, date, None]) -> Union[str, int, None]:
+        """
+        Convert the type of value to a string
+        :param value: The value to be converted
+
+        :raise TypeError: if the value is not a supported type
+
+        :return: The value as a string
+        :rtype: str
+        """
+        # each supported type is mapped to its corresponding conversion function
+        conversion_functions = {
+            bool: lambda val: str(val).lower(),
+            date: lambda val: val.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+
+        if value is None:
+            return None
+        if type(value) in conversion_functions:
+            return conversion_functions[type(value)](value)
+        logger.error("Unsupported type: %s Expected type -bool, -date", {type(value)})
+        raise TypeError(
+            f"Unsupported type: {type(value)}. Expected type -bool, -date"
+        )
+
     def _request_url(
         self, method: str, url: str, data: dict = None, params: dict = None, **kwargs
-    ):
+    ) -> dict:
         """
         :param method:
         :param url:
@@ -192,48 +218,48 @@ class MonnifyRequestClient(MonnifyBaseClient):
         data: dict = None,
         params: dict = None,
         **kwargs
-    ):
+    ) -> dict:
         """
-        :param method:
-        :param endpoint:
-        :param data:
-        :param params:
-        :param kwargs:
+        :param: method
+        :param: endpoint
+        :param: data
+        :param: params
+        :param: kwargs
         :return:
         """
         return self._request_url(method, url=endpoint, data=data, params=params, **kwargs)
 
-    def _get(self, endpoint: str, params: dict = None, **kwargs):
+    def _get(self, endpoint: str, params: dict = None, **kwargs) -> dict:
         """
-        :param endpoint:
-        :param params:
-        :param kwargs:
+        :param: endpoint
+        :param: params
+        :param: kwargs
         :return:
         """
         return self._request_url_method("GET", endpoint, params, **kwargs)
 
-    def _post(self, endpoint: str, data: dict = None, **kwargs):
+    def _post(self, endpoint: str, data: dict = None, **kwargs) -> dict:
         """
-        :param endpoint:
-        :param data:
-        :param kwargs:
+        :param: endpoint
+        :param: data
+        :param: kwargs
         :return:
         """
         return self._request_url_method("POST", endpoint=endpoint, data=data, **kwargs)
 
-    def _put(self, endpoint: str, data: dict = None, **kwargs):
+    def _put(self, endpoint: str, data: dict = None, **kwargs) -> dict:
         """
-        :param endpoint:
-        :param data:
-        :param kwargs:
+        :param: endpoint
+        :param: data
+        :param: kwargs
         :return:
         """
         return self._request_url_method("PUT", endpoint=endpoint, data=data, **kwargs)
 
-    def _delete(self, endpoint: str, **kwargs):
+    def _delete(self, endpoint: str, **kwargs) -> dict:
         """
-        :param endpoint:
-        :param kwargs:
+        :param: endpoint
+        :param: kwargs
         :return:
         """
         return self._request_url_method("DELETE", endpoint=endpoint, **kwargs)

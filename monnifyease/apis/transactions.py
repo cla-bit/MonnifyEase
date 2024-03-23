@@ -26,18 +26,18 @@ class Transactions(MonnifyRequestClient):
     ) -> dict:
         """
         Reference: https://developers.monnify.com/api/#get-all-transactions
-        :param per_page:
-        :param page_size:
-        :param payment_reference:
-        :param transaction_reference:
-        :param from_amount:
-        :param to_amount:
-        :param amount:
-        :param customer_name:
-        :param customer_email:
-        :param payment_status:
-        :param from_date:
-        :param to_date:
+        :param: per_page
+        :param: page_size
+        :param: payment_reference
+        :param: transaction_reference
+        :param: from_amount
+        :param: to_amount
+        :param: amount
+        :param: customer_name
+        :param: customer_email
+        :param: payment_status
+        :param: from_date
+        :param: to_date
 
         :return: The response form the API
         :rtype: dict
